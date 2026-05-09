@@ -1,0 +1,59 @@
+{
+  "employees": [
+    {
+      "id": "1",
+      "name": "Aditi Patil",
+      "email": "aditi@example.com",
+      "department": "IT",
+      "salary": 50000
+    },
+    {
+      "id": "2",
+      "name": "Rajesh Kumar",
+      "email": "rajesh@example.com",
+      "department": "HR",
+      "salary": 45000
+    },
+    {
+      "id": "4",
+      "name": "Vikram Sharma",
+      "email": "vikram@example.com",
+      "department": "IT",
+      "salary": 60000
+    },
+    {
+      "id": "5",
+      "name": "Neha Desai",
+      "email": "neha@example.com",
+      "department": "Marketing",
+      "salary": 48000
+    },
+    {
+      "name": "Adi Joshi",
+      "email": "adi@123",
+      "department": "Finance",
+      "salary": 200000,
+      "id": "Ih4ACIZnVbE"
+    },
+    {
+      "name": "kdt",
+      "email": "adt@123",
+      "department": "Marketing",
+      "salary": 10000,
+      "id": "8Sa6tjMKbkE"
+    },
+    {
+      "name": "Aditi Patil",
+      "email": "aditidesle21@gmail.com",
+      "department": "IT",
+      "salary": 50000,
+      "joiningDate": "2026-05-13",
+      "phone": "8767844112",
+      "address": "gyygyggygugu",
+      "role": "Software Engineer",
+      "status": "Active",
+      "id": "bbbNDMSjHHw"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

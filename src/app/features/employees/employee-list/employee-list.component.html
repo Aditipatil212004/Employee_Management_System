@@ -1,0 +1,224 @@
+<div class="employee-list-container">
+  <section class="page-header">
+    <div class="header-copy">
+      <p class="eyebrow">Workforce overview</p>
+      <h1>Employee Directory</h1>
+      <p class="page-subtitle">A polished workspace for managing employee records, departments, and compensation.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/dashboard/add-employee" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Add Employee
+      </a>
+      <button type="button" class="btn btn-logout" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
+    </div>
+  </section>
+
+  <section class="stats-grid" *ngIf="!loading">
+    <div class="stat-card">
+      <span class="stat-icon blue"><i class="bi bi-people"></i></span>
+      <div>
+        <p>Total Employees</p>
+        <strong>{{ filteredEmployees.length }}</strong>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon green"><i class="bi bi-diagram-3"></i></span>
+      <div>
+        <p>Departments</p>
+        <strong>{{ departmentCount }}</strong>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon cyan"><i class="bi bi-wallet2"></i></span>
+      <div>
+        <p>Total Payroll</p>
+        <strong>{{ formatSalary(totalPayroll) }}</strong>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon amber"><i class="bi bi-graph-up-arrow"></i></span>
+      <div>
+        <p>Average Salary</p>
+        <strong>{{ formatSalary(averageSalary) }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast-stack" *ngIf="toast.visible">
+    <div class="theme-toast success" role="status" aria-live="polite">
+      <span class="toast-icon"><i class="bi bi-check2-circle"></i></span>
+      <div class="toast-copy">
+        <strong>Success</strong>
+        <span>{{ toast.message }}</span>
+      </div>
+      <button type="button" class="toast-close" (click)="dismissToast()" aria-label="Dismiss notification">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="alert alert-danger alert-dismissible fade show" *ngIf="error" role="alert">
+    <i class="bi bi-exclamation-triangle"></i> {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <section class="toolbar">
+    <div class="toolbar-controls">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search by name"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+        />
+        <button class="btn btn-link" type="button" (click)="clearSearch()" *ngIf="searchTerm || selectedDepartment" aria-label="Clear filters">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="filter-box">
+        <i class="bi bi-funnel"></i>
+        <select class="form-select" [(ngModel)]="selectedDepartment" (change)="onDepartmentFilter()" aria-label="Filter by department">
+          <option value="">All departments</option>
+          <option *ngFor="let department of departmentOptions" [value]="department">{{ department }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="result-count">
+      <strong>{{ filteredEmployees.length }}</strong>
+      <span>{{ filteredEmployees.length === 1 ? 'employee' : 'employees' }}</span>
+    </div>
+  </section>
+
+  <section class="skeleton-shell" *ngIf="loading">
+    <div class="skeleton-row" *ngFor="let item of [1,2,3,4,5]">
+      <span></span>
+      <strong></strong>
+      <em></em>
+      <i></i>
+    </div>
+  </section>
+
+  <section class="empty-state" *ngIf="!loading && filteredEmployees.length === 0">
+    <i class="bi bi-inbox"></i>
+    <h2>No employees found</h2>
+    <p>{{ searchTerm ? 'Try a different search term.' : 'Add your first employee to begin.' }}</p>
+    <a routerLink="/dashboard/add-employee" class="btn btn-primary" *ngIf="!searchTerm">
+      <i class="bi bi-plus-lg"></i> Add First Employee
+    </a>
+  </section>
+
+  <section class="table-shell" *ngIf="!loading && filteredEmployees.length > 0">
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>Employee</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Status</th>
+            <th>Salary</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let employee of paginatedEmployees; let i = index">
+            <td><span class="id-pill">{{ (currentPage - 1) * pageSize + i + 1 }}</span></td>
+            <td>
+              <div class="employee-cell">
+                <span class="avatar">{{ getInitials(employee.name) }}</span>
+                <div>
+                  <strong>{{ employee.name }}</strong>
+                  <small>{{ employee.role || 'Employee' }}</small>
+                </div>
+              </div>
+            </td>
+            <td class="text-muted">{{ employee.email }}</td>
+            <td>
+              <span [class]="'department-badge ' + getDepartmentBadgeClass(employee.department)">
+                {{ employee.department }}
+              </span>
+            </td>
+            <td>
+              <span [class]="'status-badge ' + getStatusClass(employee.status)">
+                {{ employee.status || 'Active' }}
+              </span>
+            </td>
+            <td><strong>{{ formatSalary(employee.salary) }}</strong></td>
+            <td>
+              <div class="action-buttons">
+                <a
+                  [routerLink]="['/dashboard/edit-employee', employee.id]"
+                  class="btn btn-sm btn-light"
+                  title="Edit Employee"
+                >
+                  <i class="bi bi-pencil-square"></i> Edit
+                </a>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="showDeleteConfirm(employee)"
+                  title="Delete Employee"
+                >
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination-bar" *ngIf="totalPages > 1">
+      <button type="button" class="btn btn-light" (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <button
+        type="button"
+        class="btn page-btn"
+        *ngFor="let page of pageNumbers"
+        [class.active]="page === currentPage"
+        (click)="setPage(page)"
+      >
+        {{ page }}
+      </button>
+      <button type="button" class="btn btn-light" (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </section>
+
+  <div
+    class="modal fade show"
+    *ngIf="deleteConfirm.show"
+    tabindex="-1"
+    role="dialog"
+    style="display: block;"
+  >
+    <div class="modal-backdrop-custom" (click)="cancelDelete()"></div>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow text-danger">Confirm delete</p>
+            <h5 class="modal-title">Remove {{ deleteConfirm.employeeName }}?</h5>
+          </div>
+          <button type="button" class="btn-close" (click)="cancelDelete()"></button>
+        </div>
+        <div class="modal-body">
+          <p>This employee record will be permanently deleted.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" (click)="cancelDelete()">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+            <i class="bi bi-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

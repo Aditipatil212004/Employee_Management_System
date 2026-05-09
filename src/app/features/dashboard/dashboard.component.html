@@ -1,0 +1,231 @@
+<div class="dashboard-page">
+  <section class="dashboard-hero">
+    <div class="hero-content">
+      <p class="eyebrow">Admin Dashboard</p>
+      <h1>Workforce Overview Dashboard</h1>
+      <p>Monitor employee headcount, salary trends, department distribution, and recent activity from one clear operational view.</p>
+    </div>
+
+    <div class="hero-snapshot" aria-label="Dashboard summary">
+      <div>
+        <span>Total payroll</span>
+        <strong>{{ formatSalary(totalSalary) }}</strong>
+      </div>
+      <div>
+        <span>Active rate</span>
+        <strong>{{ activeRate }}%</strong>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="alert alert-danger" *ngIf="error">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ error }}
+  </div>
+
+  <section class="analytics-grid">
+    <article class="analytics-card">
+      <span class="card-icon blue"><i class="bi bi-people-fill"></i></span>
+      <p>Total Employees</p>
+      <strong [appCountUp]="totalEmployees"></strong>
+    </article>
+
+    <article class="analytics-card">
+      <span class="card-icon green"><i class="bi bi-diagram-3-fill"></i></span>
+      <p>Departments</p>
+      <strong [appCountUp]="totalDepartments"></strong>
+    </article>
+
+    <article class="analytics-card">
+      <span class="card-icon cyan"><i class="bi bi-cash-coin"></i></span>
+      <p>Avg Salary</p>
+      <strong>{{ formatSalary(averageSalary) }}</strong>
+    </article>
+
+    <article class="analytics-card">
+      <span class="card-icon amber"><i class="bi bi-trophy-fill"></i></span>
+      <p>Highest Salary</p>
+      <strong>{{ formatSalary(highestSalary) }}</strong>
+    </article>
+
+    <article class="analytics-card">
+      <span class="card-icon violet"><i class="bi bi-patch-check-fill"></i></span>
+      <p>Active Now</p>
+      <strong [appCountUp]="activeEmployees"></strong>
+    </article>
+
+    <article class="analytics-card">
+      <span class="card-icon rose"><i class="bi bi-stars"></i></span>
+      <p>New This Month</p>
+      <strong [appCountUp]="newEmployees"></strong>
+    </article>
+  </section>
+
+  <section class="quick-actions">
+    <a routerLink="/dashboard/add-employee" class="quick-card">
+      <i class="bi bi-person-badge"></i>
+      <span>
+        <strong>Add Employee</strong>
+        <small>Onboard a new team member</small>
+      </span>
+      <i class="bi bi-arrow-up-right"></i>
+    </a>
+
+    <a routerLink="/dashboard/employees" class="quick-card">
+      <i class="bi bi-search"></i>
+      <span>
+        <strong>Search Directory</strong>
+        <small>Find records and details</small>
+      </span>
+      <i class="bi bi-arrow-up-right"></i>
+    </a>
+  </section>
+
+  <section class="dashboard-content">
+    <div class="panel chart-panel">
+      <div class="panel-header">
+        <h2><i class="bi bi-pie-chart-fill"></i> Department Distribution</h2>
+        <span class="premium-badge">{{ topDepartment }} leading</span>
+      </div>
+
+      <div class="premium-pie-layout" *ngIf="departments.length && pieSegments.length; else noChart">
+        <div class="pie-chart-container" #chartContainer>
+          <svg viewBox="0 0 200 200" class="premium-pie-chart" role="img" aria-label="Department distribution chart">
+            <defs>
+              <linearGradient *ngFor="let segment of pieSegments; let i = index" [id]="'grad' + i" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" [attr.stop-color]="segment.color" />
+                <stop offset="100%" [attr.stop-color]="segment.colorLight" />
+              </linearGradient>
+            </defs>
+
+            <g
+              *ngFor="let segment of pieSegments; let i = index"
+              class="pie-segment-group"
+              [class.hovered]="isSegmentHovered(i)"
+              (mouseenter)="onSegmentHover(i)"
+              (mousemove)="onSegmentMove($event, chartContainer.getBoundingClientRect())"
+              (mouseleave)="onSegmentHover(null)">
+              <path [attr.d]="getSegmentPath(i)" [attr.fill]="'url(#grad' + i + ')'" class="pie-segment" />
+            </g>
+
+            <circle cx="100" cy="100" r="50" class="center-circle" />
+            <text x="100" y="92" text-anchor="middle" class="center-label-small">Teams</text>
+            <text x="100" y="114" text-anchor="middle" class="center-label-large">{{ totalDepartments }}</text>
+            <text x="100" y="129" text-anchor="middle" class="center-label-accent">Active</text>
+          </svg>
+
+          <div
+            class="chart-tooltip"
+            *ngIf="tooltipVisible && activeSegment"
+            [style.left.px]="tooltipX"
+            [style.top.px]="tooltipY"
+          >
+            <strong>{{ activeSegment.label }}</strong>
+            <span>{{ activeSegment.percentage }}% of workforce</span>
+            <small>{{ activeSegment.count }} employee{{ activeSegment.count !== 1 ? 's' : '' }}</small>
+          </div>
+        </div>
+
+        <div class="premium-legend">
+          <div
+            class="legend-item-premium"
+            *ngFor="let segment of pieSegments; let i = index"
+            [class.hovered]="isSegmentHovered(i)"
+            (mouseenter)="onSegmentHover(i)"
+            (mouseleave)="onSegmentHover(null)">
+            <span class="legend-dot" [style.background]="segment.color"></span>
+            <div class="legend-content">
+              <div class="legend-header">
+                <b>{{ segment.label }}</b>
+                <em>{{ segment.percentage }}%</em>
+              </div>
+              <small>{{ segment.count }} team member{{ segment.count !== 1 ? 's' : '' }}</small>
+              <div class="legend-bar">
+                <div class="legend-bar-fill" [style.width.%]="segment.percentage" [style.background]="segment.color"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noChart>
+        <div class="empty-state-premium">
+          <i class="bi bi-pie-chart"></i>
+          <p class="muted">Add employees to see distribution</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2><i class="bi bi-bar-chart-fill teal"></i> Department Spread</h2>
+        <span>{{ departments.length }} teams active</span>
+      </div>
+
+      <div class="department-bars" *ngIf="departments.length; else noDepartments">
+        <div class="bar-row" *ngFor="let department of departments; let i = index">
+          <div class="bar-label">
+            <strong>{{ department }}</strong>
+            <span>{{ departmentShare(department) }}%</span>
+          </div>
+          <div class="progress">
+            <div class="progress-bar" [style.width.%]="departmentShare(department)" [style.background]="departmentColor(i)"></div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noDepartments>
+        <div class="empty-state">
+          <i class="bi bi-bar-chart"></i>
+          <p class="muted">No department data yet</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2><i class="bi bi-people-fill violet-icon"></i> Recent Hires</h2>
+        <a routerLink="/dashboard/employees">View all <i class="bi bi-arrow-right"></i></a>
+      </div>
+
+      <div class="recent-list" *ngIf="recentEmployees.length; else noRecent">
+        <div class="recent-item" *ngFor="let employee of recentEmployees">
+          <span class="avatar">{{ getInitials(employee.name) }}</span>
+          <div>
+            <strong>{{ employee.name }}</strong>
+            <small>{{ employee.role || employee.department }}</small>
+          </div>
+          <span class="salary">{{ formatSalary(employee.salary) }}</span>
+        </div>
+      </div>
+
+      <ng-template #noRecent>
+        <div class="empty-state">
+          <i class="bi bi-people"></i>
+          <p class="muted">No employees added yet</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="panel activity-panel">
+      <div class="panel-header">
+        <h2><i class="bi bi-clock-history amber-icon"></i> Activity Feed</h2>
+        <span>Latest updates</span>
+      </div>
+
+      <div class="timeline" *ngIf="activityItems.length; else noActivity">
+        <div class="timeline-item" *ngFor="let item of activityItems">
+          <span></span>
+          <p><i class="bi bi-person-plus-fill"></i>{{ item }}</p>
+        </div>
+      </div>
+
+      <ng-template #noActivity>
+        <div class="empty-state">
+          <i class="bi bi-bell"></i>
+          <p class="muted">No recent activity</p>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+</div>

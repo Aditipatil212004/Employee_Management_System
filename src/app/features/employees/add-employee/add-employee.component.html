@@ -1,0 +1,221 @@
+<div class="employee-form-page add-employee-container">
+  <section class="page-header">
+    <button type="button" class="btn btn-back" (click)="goBack()" aria-label="Back to employees">
+      <i class="bi bi-arrow-left"></i>
+    </button>
+    <div class="header-content">
+      <p class="eyebrow">Create profile</p>
+      <h1>Add Employee</h1>
+      <p class="page-subtitle">Add a new employee record with department and compensation details.</p>
+    </div>
+  </section>
+
+  <div class="alert alert-danger alert-dismissible fade show" *ngIf="error" role="alert">
+    <i class="bi bi-exclamation-circle"></i> {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <section class="form-card">
+    <aside class="form-aside">
+      <span class="aside-icon initials-preview">{{ previewInitials }}</span>
+      <h2>Employee Details</h2>
+      <p>Use clear, accurate information so employee records stay useful across the system.</p>
+      <div class="aside-note">
+        <i class="bi bi-shield-check"></i>
+        <span>All required fields are marked with an asterisk.</span>
+      </div>
+    </aside>
+
+    <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="name" class="form-label">Full Name <span class="required">*</span></label>
+          <div class="field-shell">
+            <i class="bi bi-person"></i>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              formControlName="name"
+              placeholder="Enter full name"
+              [class.is-invalid]="submitted && f['name'].errors"
+            />
+          </div>
+          <div class="invalid-feedback d-block" *ngIf="submitted && f['name'].errors">
+            <span *ngIf="f['name'].errors['required']">Name is required</span>
+            <span *ngIf="f['name'].errors['minlength']">Name must be at least 3 characters</span>
+            <span *ngIf="f['name'].errors['maxlength']">Name must not exceed 50 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address <span class="required">*</span></label>
+          <div class="field-shell">
+            <i class="bi bi-envelope"></i>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              formControlName="email"
+              placeholder="name@company.com"
+              [class.is-invalid]="submitted && f['email'].errors"
+            />
+          </div>
+          <div class="invalid-feedback d-block" *ngIf="submitted && f['email'].errors">
+            <span *ngIf="f['email'].errors['required']">Email is required</span>
+            <span *ngIf="f['email'].errors['email']">Please enter a valid email</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="department" class="form-label">Department <span class="required">*</span></label>
+          <div class="field-shell">
+            <i class="bi bi-briefcase"></i>
+            <select
+              class="form-control"
+              id="department"
+              formControlName="department"
+              [class.is-invalid]="submitted && f['department'].errors"
+            >
+              <option value="">Select department</option>
+              <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+            </select>
+          </div>
+          <div class="invalid-feedback d-block" *ngIf="submitted && f['department'].errors">
+            <span>Department is required</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="salary" class="form-label">Annual Salary <span class="required">*</span></label>
+          <div class="field-shell">
+            <i class="bi bi-currency-rupee"></i>
+            <input
+              type="number"
+              class="form-control"
+              id="salary"
+              formControlName="salary"
+              placeholder="Enter annual salary"
+              [class.is-invalid]="submitted && f['salary'].errors"
+            />
+          </div>
+          <small class="form-text">Range: ₹10,000 - ₹5,00,000</small>
+          <div class="invalid-feedback d-block" *ngIf="submitted && f['salary'].errors">
+            <span *ngIf="f['salary'].errors['required']">Salary is required</span>
+            <span *ngIf="f['salary'].errors['min']">Minimum salary is ₹10,000</span>
+            <span *ngIf="f['salary'].errors['max']">Maximum salary is ₹5,00,000</span>
+            <span *ngIf="f['salary'].errors['pattern']">Please enter a valid number</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="joiningDate" class="form-label">Joining Date <span class="required">*</span></label>
+          <div class="field-shell">
+            <i class="bi bi-calendar3"></i>
+            <input
+              type="date"
+              class="form-control"
+              id="joiningDate"
+              formControlName="joiningDate"
+              [class.is-invalid]="submitted && f['joiningDate'].errors"
+            />
+          </div>
+          <div class="invalid-feedback d-block" *ngIf="submitted && f['joiningDate'].errors">
+            <span>Joining date is required</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone" class="form-label">Phone Number <span class="required">*</span></label>
+          <div class="field-shell">
+            <i class="bi bi-telephone"></i>
+            <input
+              type="tel"
+              class="form-control"
+              id="phone"
+              formControlName="phone"
+              placeholder="10 digit phone number"
+              [class.is-invalid]="submitted && f['phone'].errors"
+            />
+          </div>
+          <div class="invalid-feedback d-block" *ngIf="submitted && f['phone'].errors">
+            <span *ngIf="f['phone'].errors['required']">Phone number is required</span>
+            <span *ngIf="f['phone'].errors['pattern']">Enter a valid 10 digit phone number</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="role" class="form-label">Employee Role <span class="required">*</span></label>
+          <div class="field-shell">
+            <i class="bi bi-award"></i>
+            <select
+              class="form-control"
+              id="role"
+              formControlName="role"
+              [class.is-invalid]="submitted && f['role'].errors"
+            >
+              <option value="">Select role</option>
+              <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+            </select>
+          </div>
+          <div class="invalid-feedback d-block" *ngIf="submitted && f['role'].errors">
+            <span>Employee role is required</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="status" class="form-label">Employee Status <span class="required">*</span></label>
+          <div class="field-shell">
+            <i class="bi bi-patch-check"></i>
+            <select
+              class="form-control"
+              id="status"
+              formControlName="status"
+              [class.is-invalid]="submitted && f['status'].errors"
+            >
+              <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+            </select>
+          </div>
+          <div class="invalid-feedback d-block" *ngIf="submitted && f['status'].errors">
+            <span>Employee status is required</span>
+          </div>
+        </div>
+
+        <div class="form-group form-group-wide">
+          <label for="address" class="form-label">Address <span class="required">*</span></label>
+          <div class="field-shell textarea-shell">
+            <i class="bi bi-geo-alt"></i>
+            <textarea
+              class="form-control"
+              id="address"
+              formControlName="address"
+              rows="3"
+              placeholder="Enter employee address"
+              [class.is-invalid]="submitted && f['address'].errors"
+            ></textarea>
+          </div>
+          <div class="invalid-feedback d-block" *ngIf="submitted && f['address'].errors">
+            <span *ngIf="f['address'].errors['required']">Address is required</span>
+            <span *ngIf="f['address'].errors['minlength']">Address must be at least 5 characters</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-light" (click)="goBack()" [disabled]="loading">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="resetForm()" [disabled]="loading">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          <span *ngIf="!loading"><i class="bi bi-check-circle"></i> Add Employee</span>
+          <span *ngIf="loading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Adding...
+          </span>
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

@@ -1,0 +1,53 @@
+<header class="app-header" *ngIf="isAuthenticated" aria-label="Main navigation">
+  <a class="brand" routerLink="/dashboard" (click)="menuOpen = false">
+    <span><i class="bi bi-buildings"></i></span>
+    <div class="brand-copy">
+      <strong>TTD Logistics Pvt Ltd</strong>
+      <small>Employee Management System</small>
+    </div>
+  </a>
+
+  <button type="button" class="mobile-menu-button" (click)="toggleMenu()" [attr.aria-label]="menuOpen ? 'Close navigation' : 'Open navigation'">
+    <i class="bi" [ngClass]="menuOpen ? 'bi-x-lg' : 'bi-list'"></i>
+  </button>
+
+  <nav class="nav-links" [class.open]="menuOpen">
+    <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="menuOpen = false" aria-label="Dashboard overview">
+      <i class="bi bi-grid"></i>
+      <span>
+        <strong>Dashboard</strong>
+      </span>
+    </a>
+
+    <a routerLink="/dashboard/employees" routerLinkActive="active" (click)="menuOpen = false" aria-label="Employee directory">
+      <i class="bi bi-people"></i>
+      <span>
+        <strong>Employees</strong>
+      </span>
+    </a>
+
+    <a routerLink="/dashboard/add-employee" routerLinkActive="active" (click)="menuOpen = false" aria-label="Add new employee">
+      <i class="bi bi-person-plus"></i>
+      <span>
+        <strong>Add Employee</strong>
+      </span>
+    </a>
+  </nav>
+
+  <div class="header-actions">
+    <div class="user-chip">
+      <span class="profile-avatar">{{ userInitials }}</span>
+      <span class="profile-meta">
+        <strong>{{ userEmail }}</strong>
+        <small>Administrator</small>
+      </span>
+    </div>
+
+    <button type="button" class="logout-btn" (click)="logout()" aria-label="Logout and end session">
+      <span class="logout-icon"><i class="bi bi-box-arrow-right"></i></span>
+      <span class="logout-copy">Logout</span>
+    </button>
+  </div>
+</header>
+
+<div class="header-backdrop" *ngIf="isAuthenticated && menuOpen" (click)="toggleMenu()"></div>
