@@ -367,6 +367,54 @@ form {
   }
 }
 
+.password-field {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.password-toggle {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 999px; /* pill */
+  color: #334155;
+  cursor: pointer;
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  min-width: 46px;
+  padding: 0;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+
+  i {
+    font-size: 1.05rem;
+    line-height: 1;
+    margin-right: 0;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(13, 148, 136, 0.4);
+    box-shadow: 0 10px 20px rgba(15, 118, 110, 0.14);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 5px rgba(15, 118, 110, 0.16);
+    border-color: rgba(13, 148, 136, 0.55);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+    transform: none;
+  }
+}
+
 @media (max-width: 560px) {
   .login-container {
     padding: 18px;
@@ -381,3 +429,5 @@ form {
     padding: 20px;
   }
 }
+
+

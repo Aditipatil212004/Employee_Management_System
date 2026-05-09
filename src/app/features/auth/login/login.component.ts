@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
   submitted = false;
   loading = false;
   loginError = '';
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -102,5 +103,9 @@ export class LoginComponent implements OnInit {
       email: 'demo@example.com',
       password: 'demo123'
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 }
