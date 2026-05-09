@@ -1,59 +1,212 @@
-# EmployeeManagementSystem
+# Employee Management System
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.10.
+A modern and responsive Employee Management System built using Angular, SCSS, Bootstrap, and JSON Server. This project was developed as part of an Angular Internship Assignment for TTD Logistics Pvt. Ltd.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🚀 Features
+
+- Secure Login Page
+- Modern Dashboard with Analytics
+- Add Employee
+- Edit Employee
+- Delete Employee
+- Employee Search Functionality
+- Responsive Sidebar Navigation
+- Interactive Pie Charts
+- Animated UI & Smooth Transitions
+- Modern SaaS-style Dashboard Design
+- Responsive Layout for Mobile & Desktop
+- JSON Server API Integration
+- Professional Folder Structure
+- SCSS Styling with Modern UI Effects
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+- Angular
+- TypeScript
+- SCSS
+- Bootstrap
+- Angular Standalone Components
+
+### Backend
+
+- JSON Server
+
+### Tools
+
+- VS Code
+- Git & GitHub
+
+---
+
+## 📂 Folder Structure
+
+```bash
+src/
+│
+├── app/
+│   ├── core/
+│   │   ├── guards/
+│   │   ├── models/
+│   │   └── services/
+│   │
+│   ├── features/
+│   │   ├── auth/
+│   │   └── employees/
+│   │
+│   ├── shared/
+│   │   └── navbar/
+│   │
+│   ├── app.config.ts
+│   ├── app.routes.ts
+│   └── app.component.ts
+│
+├── styles.scss
+└── main.ts
+```
+
+---
+
+## 📊 Dashboard Features
+
+- Total Employees
+- Department Analytics
+- Interactive Pie Charts
+- Recent Employee Activity
+- Animated Statistics Cards
+- Smooth Hover Effects
+
+---
+
+## ✨ UI Highlights
+
+- Glassmorphism Design
+- Modern Gradient Colors
+- Responsive Layout
+- Smooth Animations
+- Professional Admin Dashboard UI
+- Interactive Hover Effects
+- Premium Card Design
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1️⃣ Clone Repository
+
+```bash
+git clone <your-github-repo-link>
+```
+
+---
+
+### 2️⃣ Navigate to Project
+
+```bash
+cd employee-management-system
+```
+
+---
+
+### 3️⃣ Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+### 4️⃣ Start Angular Application
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Application runs on:
 
 ```bash
-ng generate component component-name
+http://localhost:4200
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
+
+### 5️⃣ Start JSON Server
 
 ```bash
-ng generate --help
+json-server --watch db.json --port 3000
 ```
 
-## Building
-
-To build the project run:
+JSON Server runs on:
 
 ```bash
-ng build
+http://localhost:3000
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## 📌 API Endpoint
 
 ```bash
-ng test
+http://localhost:3000/employees
 ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## 📱 Responsive Design
 
-```bash
-ng e2e
-```
+The application is fully responsive and optimized for:
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+- Desktop
+- Tablet
+- Mobile Devices
 
-## Additional Resources
+---
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 🎯 Key Learning Outcomes
+
+- Angular Standalone Architecture
+- Routing & Navigation
+- Reactive Forms
+- CRUD Operations
+- API Integration
+- Component-Based Architecture
+- SCSS Styling
+- Responsive Design
+- Dashboard UI Development
+- State Handling
+
+---
+
+## 🔮 Future Improvements
+
+- Dark Mode
+- Export to Excel/PDF
+- Employee Profile Modal
+- Advanced Filters
+- Authentication with JWT
+- Backend Integration with Node.js & MongoDB
+
+---
+
+## 👩‍💻 Developer
+
+**Aditi Patil**
+
+Angular Frontend Developer Enthusiast
+
+---
+
+## 📷 Project Preview
+
+Modern Employee Management Dashboard with Analytics, Employee CRUD Operations, Interactive Charts, Responsive UI, and Professional Animations.
+
+---
+
+## ⭐ Conclusion
+
+This project demonstrates modern frontend development practices using Angular with a focus on clean architecture, responsive design, smooth user experience, and professional UI development.
