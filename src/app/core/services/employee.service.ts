@@ -68,21 +68,30 @@ export class EmployeeService {
   }
 
   /**
-   * Create new employee
+   * Add Employee
    */
   createEmployee(
-    employee: Employee
-  ): Observable<Employee> {
+  employee: Employee
+): Observable<Employee> {
 
-    employee.id = this.employees.length + 1;
+  const ids = this.employees.map(
+    employee => Number(employee.id) || 0
+  );
 
-    this.employees.push(employee);
+  const maxId =
+    ids.length > 0
+      ? Math.max(...ids)
+      : 0;
 
-    return of(employee);
-  }
+  employee.id = maxId + 1;
+
+  this.employees.push(employee);
+
+  return of(employee);
+}
 
   /**
-   * Update employee
+   * Update Employee
    */
   updateEmployee(
     id: number | string,
@@ -105,7 +114,7 @@ export class EmployeeService {
   }
 
   /**
-   * Delete employee
+   * Delete Employee
    */
   deleteEmployee(
     id: number | string
@@ -115,11 +124,11 @@ export class EmployeeService {
       emp => emp.id != Number(id)
     );
 
-    return of();
+    return of(void 0);
   }
 
   /**
-   * Search employees
+   * Search Employees
    */
   searchEmployees(
     searchTerm: string
@@ -135,6 +144,12 @@ export class EmployeeService {
         ||
 
         employee.email
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+
+        ||
+
+        employee.department
           .toLowerCase()
           .includes(searchTerm.toLowerCase())
       );
