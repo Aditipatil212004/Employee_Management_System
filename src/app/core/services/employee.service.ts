@@ -1,116 +1,153 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+
+import {
+  Observable,
+  of,
+  catchError,
+  tap,
+  map
+} from 'rxjs';
 
 import { Employee } from '../models/employee.model';
+
+const STORAGE_KEY = 'employee-management-data';
+
+const DEFAULT_EMPLOYEES: Employee[] = [
+
+  {
+    id: 1,
+    name: 'Aditi Patil',
+    email: 'aditi@gmail.com',
+    department: 'IT',
+    salary: 50000
+  },
+
+  {
+    id: 2,
+    name: 'Rahul Sharma',
+    email: 'rahul@gmail.com',
+    department: 'HR',
+    salary: 45000
+  },
+
+  {
+    id: 3,
+    name: 'Priya Verma',
+    email: 'priya@gmail.com',
+    department: 'Finance',
+    salary: 60000
+  },
+
+  {
+    id: 4,
+    name: 'Aman Gupta',
+    email: 'aman@gmail.com',
+    department: 'Marketing',
+    salary: 55000
+  }
+];
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmployeeService {
 
-  private employees: Employee[] = [
+  private apiUrl = 'http://localhost:3000/employees';
 
-    {
-      id: 1,
-      name: 'Aditi Patil',
-      email: 'aditi@gmail.com',
-      department: 'IT',
-      salary: 50000
-    },
-
-    {
-      id: 2,
-      name: 'Rahul Sharma',
-      email: 'rahul@gmail.com',
-      department: 'HR',
-      salary: 45000
-    },
-
-    {
-      id: 3,
-      name: 'Priya Verma',
-      email: 'priya@gmail.com',
-      department: 'Finance',
-      salary: 60000
-    },
-
-    {
-      id: 4,
-      name: 'Aman Gupta',
-      email: 'aman@gmail.com',
-      department: 'Marketing',
-      salary: 55000
-    }
-  ];
-
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   /**
-   * Get all employees
+   * Get All Employees
    */
   getEmployees(): Observable<Employee[]> {
 
-    return of(this.employees);
+    return this.http
+      .get<Employee[]>(this.apiUrl)
+      .pipe(
+
+        tap((employees) => {
+          this.saveLocalEmployees(employees);
+        }),
+
+        catchError(() => {
+
+          return of(this.getLocalEmployees());
+        })
+      );
   }
 
   /**
-   * Get employee by ID
+   * Get Employee By ID
    */
   getEmployeeById(
     id: number | string
   ): Observable<Employee> {
 
-    const employee = this.employees.find(
-      emp => emp.id == Number(id)
-    );
+    return this.http
+      .get<Employee>(`${this.apiUrl}/${id}`)
+      .pipe(
 
-    return of(employee as Employee);
+        catchError(() => {
+
+          const employee =
+            this.getLocalEmployees().find(
+              emp => emp.id == Number(id)
+            );
+
+          return of(employee as Employee);
+        })
+      );
   }
 
   /**
    * Add Employee
    */
   createEmployee(
-  employee: Employee
-): Observable<Employee> {
+    employee: Employee
+  ): Observable<Employee> {
 
-  const ids = this.employees.map(
-    employee => Number(employee.id) || 0
-  );
+    return this.http
+      .post<Employee>(
+        this.apiUrl,
+        employee
+      )
+      .pipe(
 
-  const maxId =
-    ids.length > 0
-      ? Math.max(...ids)
-      : 0;
+        catchError(() => {
 
-  employee.id = maxId + 1;
-
-  this.employees.push(employee);
-
-  return of(employee);
-}
+          return of(
+            this.createLocalEmployee(employee)
+          );
+        })
+      );
+  }
 
   /**
    * Update Employee
    */
   updateEmployee(
     id: number | string,
-    updatedEmployee: Employee
+    employee: Employee
   ): Observable<Employee> {
 
-    const index = this.employees.findIndex(
-      emp => emp.id == Number(id)
-    );
+    return this.http
+      .put<Employee>(
+        `${this.apiUrl}/${id}`,
+        employee
+      )
+      .pipe(
 
-    if (index !== -1) {
+        catchError(() => {
 
-      this.employees[index] = {
-        ...updatedEmployee,
-        id: Number(id)
-      };
-    }
-
-    return of(updatedEmployee);
+          return of(
+            this.updateLocalEmployee(
+              Number(id),
+              employee
+            )
+          );
+        })
+      );
   }
 
   /**
@@ -120,11 +157,23 @@ export class EmployeeService {
     id: number | string
   ): Observable<void> {
 
-    this.employees = this.employees.filter(
-      emp => emp.id != Number(id)
-    );
+    return this.http
+      .delete<void>(
+        `${this.apiUrl}/${id}`
+      )
+      .pipe(
 
-    return of(void 0);
+        catchError(() => {
+
+          this.deleteLocalEmployee(
+            Number(id)
+          );
+
+          return of(undefined);
+        }),
+
+        map(() => undefined)
+      );
   }
 
   /**
@@ -134,8 +183,11 @@ export class EmployeeService {
     searchTerm: string
   ): Observable<Employee[]> {
 
+    const employees =
+      this.getLocalEmployees();
+
     const filteredEmployees =
-      this.employees.filter(employee =>
+      employees.filter(employee =>
 
         employee.name
           .toLowerCase()
@@ -155,5 +207,115 @@ export class EmployeeService {
       );
 
     return of(filteredEmployees);
+  }
+
+  /**
+   * Get Local Employees
+   */
+  private getLocalEmployees(): Employee[] {
+
+    const storedEmployees =
+      localStorage.getItem(STORAGE_KEY);
+
+    if (!storedEmployees) {
+
+      this.saveLocalEmployees(
+        DEFAULT_EMPLOYEES
+      );
+
+      return DEFAULT_EMPLOYEES;
+    }
+
+    return JSON.parse(storedEmployees);
+  }
+
+  /**
+   * Save Local Employees
+   */
+  private saveLocalEmployees(
+    employees: Employee[]
+  ): void {
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(employees)
+    );
+  }
+
+  /**
+   * Create Local Employee
+   */
+  private createLocalEmployee(
+    employee: Employee
+  ): Employee {
+
+    const employees =
+      this.getLocalEmployees();
+
+    const ids = employees.map(
+      emp => Number(emp.id) || 0
+    );
+
+    const maxId =
+      ids.length > 0
+        ? Math.max(...ids)
+        : 0;
+
+    const newEmployee = {
+      ...employee,
+      id: maxId + 1
+    };
+
+    employees.unshift(newEmployee);
+
+    this.saveLocalEmployees(
+      employees
+    );
+
+    return newEmployee;
+  }
+
+  /**
+   * Update Local Employee
+   */
+  private updateLocalEmployee(
+    id: number,
+    employee: Employee
+  ): Employee {
+
+    const updatedEmployee = {
+      ...employee,
+      id
+    };
+
+    const employees =
+      this.getLocalEmployees().map(
+        emp => emp.id === id
+          ? updatedEmployee
+          : emp
+      );
+
+    this.saveLocalEmployees(
+      employees
+    );
+
+    return updatedEmployee;
+  }
+
+  /**
+   * Delete Local Employee
+   */
+  private deleteLocalEmployee(
+    id: number
+  ): void {
+
+    const employees =
+      this.getLocalEmployees().filter(
+        employee => employee.id !== id
+      );
+
+    this.saveLocalEmployees(
+      employees
+    );
   }
 }
