@@ -1,57 +1,144 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+
 import { Employee } from '../models/employee.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmployeeService {
-  private apiUrl = 'http://localhost:3000/employees';
 
-  constructor(private http: HttpClient) {}
+  private employees: Employee[] = [
+
+    {
+      id: 1,
+      name: 'Aditi Patil',
+      email: 'aditi@gmail.com',
+      department: 'IT',
+      salary: 50000
+    },
+
+    {
+      id: 2,
+      name: 'Rahul Sharma',
+      email: 'rahul@gmail.com',
+      department: 'HR',
+      salary: 45000
+    },
+
+    {
+      id: 3,
+      name: 'Priya Verma',
+      email: 'priya@gmail.com',
+      department: 'Finance',
+      salary: 60000
+    },
+
+    {
+      id: 4,
+      name: 'Aman Gupta',
+      email: 'aman@gmail.com',
+      department: 'Marketing',
+      salary: 55000
+    }
+  ];
+
+  constructor() {}
 
   /**
    * Get all employees
    */
   getEmployees(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(this.apiUrl);
+
+    return of(this.employees);
   }
 
   /**
    * Get employee by ID
    */
-  getEmployeeById(id: number | string): Observable<Employee> {
-    return this.http.get<Employee>(`${this.apiUrl}/${id}`);
+  getEmployeeById(
+    id: number | string
+  ): Observable<Employee> {
+
+    const employee = this.employees.find(
+      emp => emp.id == Number(id)
+    );
+
+    return of(employee as Employee);
   }
 
   /**
    * Create new employee
    */
-  createEmployee(employee: Employee): Observable<Employee> {
-    return this.http.post<Employee>(this.apiUrl, employee);
+  createEmployee(
+    employee: Employee
+  ): Observable<Employee> {
+
+    employee.id = this.employees.length + 1;
+
+    this.employees.push(employee);
+
+    return of(employee);
   }
 
   /**
-   * Update existing employee
+   * Update employee
    */
-  updateEmployee(id: number | string, employee: Employee): Observable<Employee> {
-    return this.http.put<Employee>(`${this.apiUrl}/${id}`, employee);
-  }
+  updateEmployee(
+    id: number | string,
+    updatedEmployee: Employee
+  ): Observable<Employee> {
 
-  /**
-   * Delete employee by ID
-   */
-  deleteEmployee(id: number | string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  /**
-   * Search employees by name or email
-   */
-  searchEmployees(searchTerm: string): Observable<Employee[]> {
-    return this.http.get<Employee[]>(
-      `${this.apiUrl}?q=${searchTerm}`
+    const index = this.employees.findIndex(
+      emp => emp.id == Number(id)
     );
+
+    if (index !== -1) {
+
+      this.employees[index] = {
+        ...updatedEmployee,
+        id: Number(id)
+      };
+    }
+
+    return of(updatedEmployee);
+  }
+
+  /**
+   * Delete employee
+   */
+  deleteEmployee(
+    id: number | string
+  ): Observable<void> {
+
+    this.employees = this.employees.filter(
+      emp => emp.id != Number(id)
+    );
+
+    return of();
+  }
+
+  /**
+   * Search employees
+   */
+  searchEmployees(
+    searchTerm: string
+  ): Observable<Employee[]> {
+
+    const filteredEmployees =
+      this.employees.filter(employee =>
+
+        employee.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+
+        ||
+
+        employee.email
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+
+    return of(filteredEmployees);
   }
 }
